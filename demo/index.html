@@ -6,11 +6,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-    <link rel="stylesheet" href="../dist/main.css">
+    <style>
+        html,body{
+            padding:0;
+            margin:0;
+            height:100%;
+            overflow:hidden;
+        }
+        #point{
+            width:40px;
+            height:40px;
+            background:#f00;
+            position:absolute;
+            left:100px;
+            top:100px;
+        }
+        #sub{
+            width:200px;
+            height:200px;
+            background:#00f;
+            position:absolute;
+            left:100px;
+            top:100px;
+        }
+    </style>
 </head>
 
 <body>
-    <script src="../dist/main.js"></script>
+    <div id="point"></div>
+    <div id="sub"></div>
+    <script>
+            var drag = new CoolDrag.Drag('#point',{
+                onDragMove: function (obj) {
+                    if (obj.x < 0) {
+                        this.stopX();
+                        this.setX(0);
+                    } else if (obj.x + obj.width >= width) {
+                        this.stopX();
+                        this.setX(width - obj.width);
+                    } else {
+                        this.startX();
+                    }
+                    if (obj.y <= 0) {
+                        this.stopY();
+                        this.setY(0);
+                    } else if (obj.y + obj.height >= height) {
+                        this.stopY();
+                        this.setY(height - obj.height);
+                    } else {
+                        this.startY();
+                    }
+                }
+            });
+            var drag2 = new CoolDrag.Drag('#sub', {
+                    onDragMove: function (obj) {
+                        if (obj.x < 0) {
+                            this.stopX();
+                            this.setX(0);
+                        } else if (obj.x + obj.width >= width) {
+                            this.stopX();
+                            this.setX(width - obj.width);
+                        } else {
+                            this.startX();
+                        }
+                        if (obj.y <= 0) {
+                            this.stopY();
+                            this.setY(0);
+                        } else if (obj.y + obj.height >= height) {
+                            this.stopY();
+                            this.setY(height - obj.height);
+                        } else {
+                            this.startY();
+                        }
+                    }
+                });
+                drag2.listenCollision(drag,function(state){
+                    console.log('listenCollision',state)
+                });
+            var width = document.body.clientWidth;
+            var height = document.body.clientHeight;
+           console.log(drag)
+    </script>
 </body>
 
 </html>

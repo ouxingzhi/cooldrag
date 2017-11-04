@@ -1,11 +1,4 @@
-function Drag(el) {
-    this.el = el;
-    this.initEvent();
-}
 
-Drag.prototype = {
-    constructor: Drag,
-    initEvent: function() {
+const Drag = require('./drag');
 
-    }
-}
+exports.Drag = Drag;
