@@ -20,7 +20,7 @@ var bind = exports.bind = function(fn, scope){
 
 var each = exports.each = function(obj,fn,scope){
     var t = type(obj);
-    if(t === 'array' || typeof obj.length === 'number'){
+    if(obj && (t === 'array' || typeof obj.length === 'number')){
         for (var i = 0; i < obj.length; i++) {
             if(fn.call(scope, obj[i], i, obj) === false) return;
         }
