@@ -1,131 +1,125 @@
-
 const Dom = require('../base/dom');
 const View = require('../ui/view');
 const Drag = require('../base/drag');
+const LineCanvas = require('../canvas/line');
 
-class Line extends View{
-    constructor(){
+class Line extends View {
+    constructor(ops) {
         super();
         this.el.addClass('cool-ui-line');
         this.drag = new Drag(this.el);
+        this.lineCanvas = new LineCanvas(this.refs.canvas);
+
+        this.startPoint = { x: 0, y: 0 };
+        this.endPoint = { x: 0, y: 20 };
+
+        setOption.call(this, ops);
         initEvent.call(this);
     }
-    render(){
+    render() {
         return [
             '<canvas ref="canvas" class="cool-canvas"></canvas>',
             '<div ref="ctrlLineStart" class="cool-control cool-ui-line-start"></div>',
             '<div ref="ctrlLineEnd" class="cool-control cool-ui-line-end"></div>'
         ].join('')
     }
+    to(a, b) {
+
+        var w = Math.abs(a.x - b.x);
+        var h = Math.abs(a.y - b.y);
+
+        var x = Math.min(a.x, b.x);
+        var y = Math.min(a.y, b.y);
+
+        console.log(x, y)
+
+        this.el.css({
+            'left': x + 'px',
+            'top': y + 'px',
+            'width': w + 'px',
+            'height': h + 'px'
+        });
+        this.$refs.canvas.attr('width', w);
+        this.$refs.canvas.attr('height', h);
+
+        var startX = a.x - x;
+        var startY = a.y - y;
+        var endX = b.x - x;
+        var endY = b.y - y;
+        this.$refs.ctrlLineStart.css({
+            left: (startX - (this.$refs.ctrlLineStart.width() / 2)) + 'px',
+            top: (startY - (this.$refs.ctrlLineStart.height() / 2)) + 'px'
+        });
+        this.$refs.ctrlLineEnd.css({
+            left: (endX - (this.$refs.ctrlLineEnd.width() / 2)) + 'px',
+            top: (endY - (this.$refs.ctrlLineEnd.height() / 2)) + 'px'
+        });
+
+        this.startPoint = {
+            x: startX,
+            y: startY
+        };
+        this.endPoint = {
+            x: endX,
+            y: endY
+        }
+        this.lineCanvas.to(this.startPoint, this.endPoint);
+    }
+}
+
+function setOption(ops) {
+    ops = ops || {};
+    if (ops.startPoint) {
+        this.startPoint = startPoint;
+    }
+    if (ops.endPoint) {
+        this.endPoint = endPoint;
+    }
 }
 
 
 function initEvent() {
     var self = this;
-    var ctrl;
-    var startW;
-    var startH;
-    var startMX;
-    var startMY;
-    var startDX;
-    var startDY;
 
-    this.drag.on('dragstart', function (obj) {
+    var ctrl;
+    var rePoint;
+
+    this.drag.on('dragstart', function(obj) {
         var event = obj.event;
         var target = event.target;
-        startW = obj.width;
-        startH = obj.height;
-        startMX = obj.mouseX;
-        startMY = obj.mouseY;
-        startDX = obj.domX;
-        startDY = obj.domY;
         ctrl = '';
         if (self.$refs.ctrlLineStart.isConainer(target)) {
             this.stop();
+            rePoint = self.$refs.ctrlLineEnd.posByPage();
             ctrl = 'lineStart';
         }
         if (self.$refs.ctrlLineEnd.isConainer(target)) {
             this.stop();
+            rePoint = self.$refs.ctrlLineStart.posByPage();
             ctrl = 'lineEnd';
         }
 
     });
-    this.drag.on('dragmove', function (obj) {
-        function lineStart(){
-            var startStyles = {left:'auto',top:'auto',right:'auto',bottom:'auto'};
-                var endStyles = { left: 'auto', top: 'auto', right: 'auto', bottom: 'auto' };
-                if(obj.mouseX > startMX + startW){
-                    var w = obj.mouseX - startDX - startW;
-                    var x = startDX + startW;
-                    startStyles.right = '0px';
-                    endStyles.left = '0px';
-                }else{
-                    var w = startW + (startMX - obj.mouseX);
-                    var x = obj.mouseX;
-                    startStyles.left = '0px';
-                    endStyles.right = '0px';
-                }
-                if(obj.mouseY > startMY + startH){
-                    var h = obj.mouseY - startDY - startH;
-                    var y = startDY + startH;
-                    startStyles.bottom = '0px';
-                    endStyles.top = '0px';
-                }else{
-                    var h = startH + (startMY - obj.mouseY);
-                    var y = obj.mouseY;
-                    startStyles.top = '0px';
-                    endStyles.bottom = '0px';
-                }
-                
-                self.el.css({
-                    'left': x + 'px',
-                    'top': y + 'px',
-                    'width': w + 'px',
-                    'height': h + 'px'
-                });
+    this.drag.on('dragmove', function(obj) {
+        function lineStart() {
 
-                console.log(x,y,w,h);
-                self.$refs.ctrlLineStart.css(startStyles);
-                self.$refs.ctrlLineEnd.css(endStyles);
+            self.to({
+                x: obj.mouseX,
+                y: obj.mouseY
+            }, {
+                x: rePoint.left,
+                y: rePoint.top
+            });
         }
 
-        function lineEnd(){
-            var startStyles = { left: 'auto', top: 'auto', right: 'auto', bottom: 'auto' };
-            var endStyles = { left: 'auto', top: 'auto', right: 'auto', bottom: 'auto' };
-            if (obj.mouseX < startDX) {
-                var w = startDX - obj.mouseX;
-                var x = obj.mouseX;
-                endStyles.left = '0px';
-                startStyles.right = '0px';
-            } else {
-                var w = obj.mouseX - obj.domX;
-                var x = startDX;
-                endStyles.right = '0px';
-                startStyles.left = '0px'
-            }
-
-            if (obj.mouseY < startDY) {
-                var h = startDY - obj.mouseY;
-                var y = obj.mouseY;
-                endStyles.top = '0px';
-                startStyles.bottom = '0px'
-            } else {
-                var h = obj.mouseY - obj.domY;
-                var y = startDY;
-                endStyles.bottom = '0px'
-                startStyles.top = '0px'
-            }
-
-
-            self.el.css({
-                'left': x + 'px',
-                'top': y + 'px',
-                'width': w + 'px',
-                'height': h + 'px'
+        function lineEnd() {
+            self.to({
+                x: rePoint.left,
+                y: rePoint.top
+            }, {
+                x: obj.mouseX,
+                y: obj.mouseY
             });
-            console.log(x, y, w, h);
-            self.$refs.ctrlLineStart.css(startStyles);
-            self.$refs.ctrlLineEnd.css(endStyles);
         }
         switch (ctrl) {
             case 'lineStart':
@@ -136,8 +130,13 @@ function initEvent() {
                 break;
         }
     });
-    this.drag.on('dragend', function () {
+    this.drag.on('dragend', function() {
         this.start();
+    });
+
+    this.on('appendToAfter', function() {
+
+        this.to(this.startPoint, this.endPoint);
     })
 }
 

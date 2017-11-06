@@ -16,7 +16,7 @@ class DragBase extends Event {
         setOptions.call(this, ops);
         init.call(this);
     }
-    
+
     start() {
         this.isAllowDragX = true;
         this.isAllowDragY = true;
@@ -74,7 +74,7 @@ function initEvent() {
     var startDomTop;
     var diffX;
     var diffY;
-    this._mousedown = Base.bind(function (e) {
+    this._mousedown = Base.bind(function(e) {
         // console.log('mousedown', e)
         isDown = true;
         startMouseX = e.pageX;
@@ -85,10 +85,10 @@ function initEvent() {
         diffX = startMouseX - startDomLeft;
         diffY = startMouseY - startDomTop;
         this.emit('dragstart', {
-            event:e,
+            event: e,
             el: this.el,
-            x: startMouseX-diffX,
-            y: startMouseY-diffY,
+            x: startMouseX - diffX,
+            y: startMouseY - diffY,
             domX: startDomLeft,
             domY: startDomTop,
             width: this.el.width(),
@@ -98,11 +98,11 @@ function initEvent() {
         })
     }, this);
 
-    this._mouseup = Base.bind(function (e) {
+    this._mouseup = Base.bind(function(e) {
         if (isDown) {
             var left = e.pageX - diffX;
             var top = e.pageY - diffY;
-            
+
             this.emit('dragend', {
                 event: e,
                 el: this.el,
@@ -119,7 +119,7 @@ function initEvent() {
         }
     }, this);
 
-    this._mousemove = Base.bind(function (e) {
+    this._mousemove = Base.bind(function(e) {
         if (isDown) {
             e.preventDefault();
             var left = e.pageX - diffX;
@@ -142,7 +142,7 @@ function initEvent() {
     this.el.on('mousedown', this._mousedown);
     $document.on('mouseup', this._mouseup);
     $document.on('mousemove', this._mousemove)
-    // this._el.on('mousemove',mousemove);
+        // this._el.on('mousemove',mousemove);
 }
 
 
