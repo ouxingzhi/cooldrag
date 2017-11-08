@@ -9,8 +9,10 @@ class View extends Event {
         this.$refs = {};
         this.__el = Dom.$('<div class="cool-view"></div>');
         this.el.append(Dom.$(this.render()));
+        this.emit('disposeDomBefore');
         disposeDom.call(this)
     }
+
     get el() {
         return this.__el;
     }

@@ -1,8 +1,13 @@
+const Base = require('../base/base');
 const Dom = require('../base/dom');
 const Drag = require('../base/drag');
 const View = require('./view');
 
 const defaultConfig = {
+    x: 0,
+    y: 0,
+    width: 180,
+    height: 180,
     minWidth: 100,
     minHeight: 100,
     maxWidth: 200,
@@ -13,31 +18,55 @@ const defaultConfig = {
 class Component extends View {
     constructor(config) {
         super();
+        this.lastPos;
+        this.lastSize;
+        this.inters = {};
+        this.$inters = {};
+        initDom.call(this);
         this.config = Object.assign({}, defaultConfig, config);
         this.el.addClass('cool-ui-component');
         this.drag = new Drag(this.el);
-        initEvent.call(this)
+        this.to({
+            x: this.config.x,
+            y: this.config.y
+        }, {
+            w: this.config.width,
+            h: this.config.height
+        })
+        initEvent.call(this);
+    }
+    contentRender() {
+        return '';
     }
     render() {
+        var content = this.contentRender();
         return [
             '<canvas ref="canvas" class="cool-canvas"></canvas>',
-            '<div ref="content" class="cool-content"></div>',
+            '<div ref="content" class="cool-content">' + content + '</div>',
             '<div ref="ctrlLeftTop" class="cool-control cool-control-left-top"></div>',
             '<div ref="ctrlRightTop" class="cool-control cool-control-right-top"></div>',
             '<div ref="ctrlLeftBottom" class="cool-control cool-control-left-bottom"></div>',
             '<div ref="ctrlRightBottom" class="cool-control cool-control-right-bottom"></div>',
-            '<div ref="interLeft" class="cool-interface cool-interface-left"></div>',
-            '<div ref="interTop" class="cool-interface cool-interface-top"></div>',
-            '<div ref="interBottom" class="cool-interface cool-interface-bottom"></div>',
-            '<div ref="interRight" class="cool-interface cool-interface-right"></div>'
+            '<div interface="left" ref="interLeft" class="cool-interface cool-interface-left"></div>',
+            '<div interface="top" ref="interTop" class="cool-interface cool-interface-top"></div>',
+            '<div interface="bottom" ref="interBottom" class="cool-interface cool-interface-bottom"></div>',
+            '<div interface="right" ref="interRight" class="cool-interface cool-interface-right"></div>'
         ].join('')
     }
     to(pos, size) {
+        this.lastPos = pos = pos || this.lastPos || {
+            x: defaultConfig.x,
+            y: defaultConfig.y
+        }
+        this.lastSize = size = size || this.lastSize || {
+            x: defaultConfig.width,
+            y: defaultConfig.height
+        }
         this.el.css({
             'left': pos.x + 'px',
             'top': pos.y + 'px',
             'width': size.w + 'px',
-            'height': size.y + 'px'
+            'height': size.h + 'px'
         });
         this.$refs.canvas.attr({
             width: size.w,
@@ -49,22 +78,32 @@ class Component extends View {
         var y = parseFloat(this.el.css('top'));
         var w = parseFloat(this.el.css('width'));
         var h = parseFloat(this.el.css('height'));
+        var inter = {};
+        Base.each(this.$inters, function($inter, key) {
+            inter[key] = $inter.posByPage();
+        });
         return {
             x: x,
             y: y,
             w: w,
             h: h,
-            inter: {
-                left: this.$refs.interLeft.posByPage(),
-                top: this.$refs.interTop.posByPage(),
-                right: this.$refs.interRight.posByPage(),
-                bottom: this.$refs.interBottom.posByPage()
-            }
+            inter: inter
         }
     }
 }
 
-
+function initDom() {
+    var inters = this.el.find('[interface]');
+    var self = this;
+    inters.each(function(inter) {
+        var $inter = Dom.$(inter);
+        var key = $inter.attr('interface');
+        if (!self.inters[key]) {
+            self.inters[key] = inter;
+            self.$inters[key] = $inter;
+        }
+    });
+}
 
 function initEvent() {
     var self = this;

@@ -1,5 +1,5 @@
 const Dom = require('../base/dom');
-const View = require('../ui/view');
+const View = require('./view');
 const Drag = require('../base/drag');
 const LineCanvas = require('../canvas/line');
 

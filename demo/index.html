@@ -58,13 +58,10 @@
             y: pos.inter.left.top + pos.inter.left.height / 2
         })
 
-        var conponent2 = new CoolDrag.Component();
+        var conponent2 = new CoolDrag.Module();
         conponent2.to({
             x: 200,
             y: 200
-        }, {
-            w: 100,
-            h: 100
         });
         conponent2.appendTo(document.body);
         conponent2.on('move', function(obj) {

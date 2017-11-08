@@ -8,6 +8,7 @@ class Line extends Canvas {
         this.draw(function(ctx) {
             this.cleanViewport();
             ctx.strokeStyle = '#333';
+            ctx.
             ctx.moveTo(start.x, start.y);
 
             ctx.lineTo(end.x, end.y);
