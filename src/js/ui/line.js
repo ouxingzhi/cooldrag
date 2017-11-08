@@ -25,13 +25,16 @@ class Line extends View {
     }
     to(a, b) {
 
+        this.startPoint = a;
+        this.endPoint = b;
+
         var w = Math.abs(a.x - b.x);
         var h = Math.abs(a.y - b.y);
 
         var x = Math.min(a.x, b.x);
         var y = Math.min(a.y, b.y);
 
-        console.log(x, y)
+        console.log(a, b)
 
         this.el.css({
             'left': x + 'px',
@@ -39,8 +42,9 @@ class Line extends View {
             'width': w + 'px',
             'height': h + 'px'
         });
-        this.$refs.canvas.attr('width', w);
-        this.$refs.canvas.attr('height', h);
+
+        this.$refs.canvas.attr('width', w < 5 ? 5 : w);
+        this.$refs.canvas.attr('height', h < 5 ? 5 : h);
 
         var startX = a.x - x;
         var startY = a.y - y;
@@ -55,15 +59,21 @@ class Line extends View {
             top: (endY - (this.$refs.ctrlLineEnd.height() / 2)) + 'px'
         });
 
-        this.startPoint = {
+        var start = {
             x: startX,
             y: startY
         };
-        this.endPoint = {
+        var end = {
             x: endX,
             y: endY
         }
-        this.lineCanvas.to(this.startPoint, this.endPoint);
+        this.lineCanvas.to(start, end);
+    }
+    moveStart(pos) {
+        this.to(pos, this.endPoint);
+    }
+    moveEnd(pos) {
+        this.to(this.startPoint, pos);
     }
 }
 
@@ -90,15 +100,23 @@ function initEvent() {
         ctrl = '';
         if (self.$refs.ctrlLineStart.isConainer(target)) {
             this.stop();
-            rePoint = self.$refs.ctrlLineEnd.posByPage();
+            var obj = self.$refs.ctrlLineEnd.posByPage();
+            rePoint = {
+                left: obj.left + obj.width / 2,
+                top: obj.top + obj.height / 2
+            }
             ctrl = 'lineStart';
         }
         if (self.$refs.ctrlLineEnd.isConainer(target)) {
             this.stop();
-            rePoint = self.$refs.ctrlLineStart.posByPage();
+            var obj = self.$refs.ctrlLineStart.posByPage();
+            rePoint = {
+                left: obj.left + obj.width / 2,
+                top: obj.top + obj.height / 2
+            }
             ctrl = 'lineEnd';
         }
-
+        this.stop();
     });
     this.drag.on('dragmove', function(obj) {
         function lineStart() {

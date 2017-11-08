@@ -1,4 +1,3 @@
-
 var base = require('./base');
 
 var slice = [].slice;
@@ -7,33 +6,33 @@ var nodeReg = /^<.+>$/i;
 
 var con = document.createElement('div');
 
-var $ = exports.$ = function(selector,root){
-    var arr = init(selector,root);
+var $ = exports.$ = function(selector, root) {
+    var arr = init(selector, root);
     setProto(arr);
     return arr;
 }
 
-function setProto(arr){
+function setProto(arr) {
     arr.__proto__ = $.prototype;
 }
 
-function isDom(el){
+function isDom(el) {
     return !!(el && el.querySelector && el.nodeType)
 }
 
 function init(selector, root) {
     root = root || document;
     var arr = [];
-    if(typeof selector === 'string'){
+    if (typeof selector === 'string') {
         if (nodeReg.test(selector)) {
             con.innerHTML = selector;
             arr = slice.call(con.childNodes);
         } else {
             arr = slice.call(root.querySelectorAll(selector));
         }
-    } else if (isDom(selector)){
+    } else if (isDom(selector)) {
         arr = [selector];
-    } else if(selector instanceof $){
+    } else if (selector instanceof $) {
         arr = selector.slice();
     }
     return arr;
@@ -48,24 +47,24 @@ $.constructor = $;
 var fn = $.fn = $.prototype = new $();
 var createDomId = base.uniquFactory('id');
 
-fn.each = function(fn,scope){
-    base.each(this,base.bind(fn,scope||this));
+fn.each = function(fn, scope) {
+    base.each(this, base.bind(fn, scope || this));
     return this;
 }
 
-fn.find = function(selector){
+fn.find = function(selector) {
     var arr = [];
     var map = {};
-    this.each(function(item){
+    this.each(function(item) {
         var list = item.querySelectorAll(selector);
-        base.each(list,function(item){
+        base.each(list, function(item) {
             var id = item.__$id;
-            if(id){
-                if(!map[id]){
+            if (id) {
+                if (!map[id]) {
                     arr.push(item);
                     map[id] = true;
                 }
-            }else{
+            } else {
                 item.__$id = createDomId();
                 arr.push(item);
                 map[item.__$id] = true;
@@ -76,13 +75,13 @@ fn.find = function(selector){
     return arr;
 }
 
-fn.siblings = function(){
+fn.siblings = function() {
     var arr = [];
     var map = {};
-    this.each(function (item) {
+    this.each(function(item) {
         var list = item.parentNode.childNodes;
-        base.each(list, function (_item) {
-            if(item === _item) return;
+        base.each(list, function(_item) {
+            if (item === _item) return;
             var id = _item.__$id;
             if (id) {
                 if (!map[id]) {
@@ -100,10 +99,10 @@ fn.siblings = function(){
     return arr;
 }
 
-fn.next = function () {
+fn.next = function() {
     var arr = [];
     var map = {};
-    this.each(function (item) {
+    this.each(function(item) {
         var next = item.nextSibling;
         var id = next.__$id;
         if (id) {
@@ -121,10 +120,10 @@ fn.next = function () {
     return arr;
 }
 
-fn.parent = function(){
+fn.parent = function() {
     var arr = [];
     var map = {};
-    this.each(function (item) {
+    this.each(function(item) {
         var parent = item.parentNode;
         var id = parent.__$id;
         if (id) {
@@ -142,9 +141,9 @@ fn.parent = function(){
     return arr;
 }
 
-fn.matchs = function(selector){
+fn.matchs = function(selector) {
     var element = this[0];
-    if(!element) return false;
+    if (!element) return false;
     if (element.matches) {
         return element.matches(selector);
     } else if (element.matchesSelector) {
@@ -160,14 +159,14 @@ fn.matchs = function(selector){
     }
 }
 
-fn.isConainer = function(el){
+fn.isConainer = function(el) {
     var element = this[0];
     if (!element) return false;
     if (element === el) return true;
     element = $(element);
     var isExsit = false;
-    element.find('*').each(function(item){
-        if(item === el) {
+    element.find('*').each(function(item) {
+        if (item === el) {
             isExsit = true;
             return false;
         }
@@ -175,143 +174,143 @@ fn.isConainer = function(el){
     return isExsit;
 }
 
-fn.css = function(name,val){
+fn.css = function(name, val) {
     var self = this;
-    if(typeof name === 'object'){
-        base.each(name,function(val,key){
-            self.css(key,val);
+    if (typeof name === 'object') {
+        base.each(name, function(val, key) {
+            self.css(key, val);
         });
         return;
     }
-    if(val == null) return this[0] && this[0].style[name];
-    this.each(function(item){
+    if (val == null) return this[0] && this[0].style[name];
+    this.each(function(item) {
         item.style[name] = val;
     });
     return this;
 }
 
-fn.attr = function(name,val){
+fn.attr = function(name, val) {
     var self = this;
-    if(typeof name === 'object'){
-        base.each(name,function(name,val){
-            self.attr(name,val);
+    if (typeof name === 'object') {
+        base.each(name, function(val, name) {
+            self.attr(name, val);
         });
         return this;
     }
     if (val == null) return this[0] && this[0].getAttribute(name);
-    this.each(function(item){
-        item.setAttribute(name,val);
+    this.each(function(item) {
+        item.setAttribute(name, val);
     });
     return this;
 }
 
-fn.show = function(){
-    this.css('display','');
+fn.show = function() {
+    this.css('display', '');
     return this;
 };
 
-fn.hide = function(){
-    this.css('display','none');
+fn.hide = function() {
+    this.css('display', 'none');
     return this;
 }
 
 
-fn.on = function(type,fn,c){
+fn.on = function(type, fn, c) {
     var types = type.split(/\s+/);
-    this.each(function(item){
-        base.each(types,function(type){
+    this.each(function(item) {
+        base.each(types, function(type) {
             item.addEventListener(type, fn, c);
         })
     });
     return this;
 }
 
-fn.off = function(type,fn){
-    this.each(function (item) {
+fn.off = function(type, fn) {
+    this.each(function(item) {
         item.removeEventListener(type, fn);
     });
     return this;
 }
 
-fn.emit = function(type,params){
+fn.emit = function(type, params) {
     var event = document.createEvent('Event');
-    event.initEvent(type,true,true);
+    event.initEvent(type, true, true);
     event.params = params;
-    this.each(function(item){
+    this.each(function(item) {
         item.dispatchEvent(event);
     });
     return this;
 }
 
-fn.posByPage = function(){
+fn.posByPage = function() {
     var el = this[0];
     var source = el;
-    if(!el) return {left:0,top:0,width:0,height:0};
+    if (!el) return { left: 0, top: 0, width: 0, height: 0 };
     var left = 0;
     var top = 0;
-    do{
+    do {
         left += el.offsetLeft;
         top += el.offsetTop;
-    }while(el = el.offsetParent);
+    } while (el = el.offsetParent);
     return {
-        left:left,
-        top:top,
+        left: left,
+        top: top,
         width: source.offsetWidth,
         height: source.offsetHeight
     }
 }
 
 
-fn.append = function(el){
-    this.each(function(item){
-        if(el instanceof $){
-            el.each(function(target){
-                if(base.isDom(target)) item.appendChild(target);
+fn.append = function(el) {
+    this.each(function(item) {
+        if (el instanceof $) {
+            el.each(function(target) {
+                if (base.isDom(target)) item.appendChild(target);
             });
-        }else if(base.isDom(el)){
+        } else if (base.isDom(el)) {
             item.appendChild(el);
         }
     });
     return this;
 };
 
-fn.addClass = function(cls){
+fn.addClass = function(cls) {
     var reg = new RegExp('[\\^\\s]' + cls + '[\\s$]')
-    this.each(function(item){
-        if(!reg.test(item.className)){
+    this.each(function(item) {
+        if (!reg.test(item.className)) {
             item.className += ' ' + cls;
         }
     });
     return this;
 }
 
-fn.removeClass = function(cls){
-    var reg = new RegExp('(\\^|\\s)' + cls + '(\\s+|$)','g')
-    this.each(function (item) {
+fn.removeClass = function(cls) {
+    var reg = new RegExp('(\\^|\\s)' + cls + '(\\s+|$)', 'g')
+    this.each(function(item) {
         if (reg.test(item.className)) {
-            item.className = item.className.replace(reg,' ');
+            item.className = item.className.replace(reg, ' ');
         }
     });
     return this;
 }
 
-fn.matchs = function(selector){
-    
+fn.matchs = function(selector) {
+
 }
 
-fn.width = function(){
+fn.width = function() {
     var el = this[0];
     if (!el) return 0;
     return el.offsetWidth;
 }
 
-fn.height = function () {
+fn.height = function() {
     var el = this[0];
     if (!el) return 0;
     return el.offsetHeight;
 }
 
-function checkIn(targetPos, curPos){
+function checkIn(targetPos, curPos) {
     var targetLeft = targetPos.left;
     var targetRight = targetPos.left + targetPos.width;
     var targetTop = targetPos.top;
@@ -324,22 +323,19 @@ function checkIn(targetPos, curPos){
 
     return (
         (
-            targetLeft > curLeft && targetLeft < curRight
-            ||
+            targetLeft > curLeft && targetLeft < curRight ||
             targetRight > curLeft && targetRight < curRight
-        )
-        &&
+        ) &&
         (
-            targetTop > curTop && targetTop < curBottom
-            ||
+            targetTop > curTop && targetTop < curBottom ||
             targetBottom > curTop && targetBottom < curBottom
         )
     )
 }
 
-fn.collision = function(el){
+fn.collision = function(el) {
     var target = $(el);
     var targetPos = target.posByPage();
     var curPos = this.posByPage();
-    return checkIn(targetPos, curPos) || checkIn(curPos,targetPos);
+    return checkIn(targetPos, curPos) || checkIn(curPos, targetPos);
 }
