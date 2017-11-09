@@ -10,7 +10,7 @@ class View extends Event {
         this.__el = Dom.$('<div class="cool-view"></div>');
         this.el.append(Dom.$(this.render()));
         this.emit('disposeDomBefore');
-        disposeDom.call(this)
+        initDom.call(this)
     }
 
     get el() {
@@ -28,20 +28,33 @@ class View extends Event {
         el.append(this.el);
         this.emit('appendToAfter', el);
     }
+    reScanRefs(){
+        disposeRefs.call(this);
+    }
 }
 
-function disposeDom() {
+function initDom() {
+    disposeRefs.call(this);
+    disposeEvents.call(this);
+}
+
+function disposeRefs(){
     var refs = this.el.find('[ref]');
     var self = this;
-    refs.each(function(el) {
+    refs.each(function (el) {
         var $el = Dom.$(el);
         var key = $el.attr('ref');
-        self.refs[key] = el;
-        self.$refs[key] = $el;
+        if (!self.refs[key]){
+            self.refs[key] = el;
+            self.$refs[key] = $el;
+        }
     });
+}
+
+function disposeEvents(){
     var events = this.events();
     if (events) {
-        Base.each(events, function(fn, str) {
+        Base.each(events, function (fn, str) {
             var arr = str.split(/\s+/);
             var eventName = arr.shift();
             var selector = arr.join(' ');

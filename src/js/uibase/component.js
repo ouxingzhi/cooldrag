@@ -22,7 +22,7 @@ class Component extends View {
         this.lastSize;
         this.inters = {};
         this.$inters = {};
-        initDom.call(this);
+        disposeInterface.call(this);
         this.config = Object.assign({}, defaultConfig, config);
         this.el.addClass('cool-ui-component');
         this.drag = new Drag(this.el);
@@ -90,9 +90,12 @@ class Component extends View {
             inter: inter
         }
     }
+    reScanInterface(){
+        disposeInterface.call(this);
+    }
 }
 
-function initDom() {
+function disposeInterface() {
     var inters = this.el.find('[interface]');
     var self = this;
     inters.each(function(inter) {
