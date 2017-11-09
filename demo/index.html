@@ -37,26 +37,15 @@
         })
         line.appendTo(document.body);
 
-        var conponent = new CoolDrag.Component();
+        var conponent = new CoolDrag.Module();
+
         conponent.to({
             x: 0,
             y: 0
-        }, {
-            w: 100,
-            h: 100
         });
         conponent.appendTo(document.body);
-        conponent.on('move', function(obj) {
-            line.moveStart({
-                x: obj.inter.left.left + obj.inter.left.width / 2,
-                y: obj.inter.left.top + obj.inter.left.height / 2
-            })
-        });
-        var pos = conponent.getPos();
-        line.moveStart({
-            x: pos.inter.left.left + pos.inter.left.width / 2,
-            y: pos.inter.left.top + pos.inter.left.height / 2
-        })
+
+
 
         var conponent2 = new CoolDrag.Module();
         conponent2.to({
@@ -64,17 +53,6 @@
             y: 200
         });
         conponent2.appendTo(document.body);
-        conponent2.on('move', function(obj) {
-            line.moveEnd({
-                x: obj.inter.right.left + obj.inter.right.width / 2,
-                y: obj.inter.right.top + obj.inter.right.height / 2
-            })
-        });
-        var pos = conponent2.getPos();
-        line.moveEnd({
-            x: pos.inter.right.left + pos.inter.right.width / 2,
-            y: pos.inter.right.top + pos.inter.right.height / 2
-        })
     </script>
 </body>
 

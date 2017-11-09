@@ -33,6 +33,17 @@ class Component extends View {
             w: this.config.width,
             h: this.config.height
         })
+        if (!this.config.useResize) {
+            this.$refs.ctrlLeftTop.hide();
+            this.$refs.ctrlRightTop.hide();
+            this.$refs.ctrlLeftBottom.hide();
+            this.$refs.ctrlRightBottom.hide();
+        } else {
+            this.$refs.ctrlLeftTop.show();
+            this.$refs.ctrlRightTop.show();
+            this.$refs.ctrlLeftBottom.show();
+            this.$refs.ctrlRightBottom.show();
+        }
         initEvent.call(this);
     }
     contentRender() {
@@ -46,11 +57,7 @@ class Component extends View {
             '<div ref="ctrlLeftTop" class="cool-control cool-control-left-top"></div>',
             '<div ref="ctrlRightTop" class="cool-control cool-control-right-top"></div>',
             '<div ref="ctrlLeftBottom" class="cool-control cool-control-left-bottom"></div>',
-            '<div ref="ctrlRightBottom" class="cool-control cool-control-right-bottom"></div>',
-            '<div interface="left" ref="interLeft" class="cool-interface cool-interface-left"></div>',
-            '<div interface="top" ref="interTop" class="cool-interface cool-interface-top"></div>',
-            '<div interface="bottom" ref="interBottom" class="cool-interface cool-interface-bottom"></div>',
-            '<div interface="right" ref="interRight" class="cool-interface cool-interface-right"></div>'
+            '<div ref="ctrlRightBottom" class="cool-control cool-control-right-bottom"></div>'
         ].join('')
     }
     to(pos, size) {
@@ -90,7 +97,7 @@ class Component extends View {
             inter: inter
         }
     }
-    reScanInterface(){
+    reScanInterface() {
         disposeInterface.call(this);
     }
 }
@@ -104,6 +111,9 @@ function disposeInterface() {
         if (!self.inters[key]) {
             self.inters[key] = inter;
             self.$inters[key] = $inter;
+            $inter.on('mousemove', function() {
+                console.log('key', key)
+            })
         }
     });
 }
